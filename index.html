@@ -14,7 +14,25 @@
             --accent: #ec4899;
             --border: #334155;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --accent: #db2777;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -25,19 +43,69 @@
             justify-content: center;
             padding: 20px;
         }
+
         .container {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 30px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-width: 550px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
-        h1 { font-size: 1.8rem; margin-bottom: 20px; color: var(--primary); }
-        .problem { font-size: 2.5rem; margin: 20px 0; color: var(--accent); }
-        input {
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        select, button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .timer-box {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .problem-box {
+            font-size: 2.2rem;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            color: var(--accent);
+        }
+
+        input[type="number"] {
             width: 100%;
             padding: 12px;
             font-size: 1.2rem;
@@ -48,47 +116,103 @@
             text-align: center;
             margin-bottom: 15px;
         }
-        button {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
             font-size: 1.1rem;
-            cursor: pointer;
+            font-weight: bold;
         }
-        button:hover { background-color: var(--primary-hover); }
-        .score { margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>سەرکێشی بیرکاری</h1>
-        <div class="problem" id="problem">5 + 3 = ?</div>
-        <input type="number" id="answer" placeholder="وەڵامەکەت لێرە بنووسە...">
-        <button onclick="checkAnswer()">پشکنین</button>
-        <div class="score">نمرە: <span id="scoreVal">0</span></div>
+        <div class="header">
+            <select id="langSelect" onchange="changeLanguage()">
+                <option value="ckb">کوردی</option>
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+            </select>
+            <button onclick="toggleTheme()">🌙 / ☀️</button>
+        </div>
+
+        <h1 id="title">مەکۆی سەرکێشی بیرکاری</h1>
+        <div class="timer-box" id="timer">کات: 30</div>
+        
+        <div class="problem-box" id="problem">5 + 3 = ?</div>
+        
+        <input type="number" id="answerInput" placeholder="وەڵامەکەت لێرە بنووسە...">
+        <button onclick="checkAnswer()" id="submitBtn" style="width: 100%;">پشکنین</button>
+
+        <div class="stats">
+            <div><span id="scoreText">نمرە:</span> <span id="score">0</span></div>
+            <div><span id="levelText">ئاست:</span> <span id="level">1</span></div>
+        </div>
     </div>
 
     <script>
-        let num1 = 5, num2 = 3, score = 0;
-        function generate() {
-            num1 = Math.floor(Math.random() * 10) + 1;
-            num2 = Math.floor(Math.random() * 10) + 1;
-            document.getElementById('problem').innerText = ${num1} + ${num2} = ?;
-            document.getElementById('answer').value = '';
+        const translations = {
+            ckb: { title: "مەکۆی سەرکێشی بیرکاری", score: "نمرە:", level: "ئاست:", placeholder: "وەڵامەکەت لێرە بنووسە...", btn: "پشکنین", time: "کات:" },
+            ar: { title: "مغامرة الرياضيات", score: "النتيجة:", level: "المستوى:", placeholder: "اكتب إجابتك هنا...", btn: "تحقق", time: "الوقت:" },
+            en: { title: "Math Adventure", score: "Score:", level: "Level:", placeholder: "Type your answer...", btn: "Check", time: "Time:" }
+        };
+
+        let currentLang = 'ckb';
+        let score = 0;
+        let level = 1;
+        let timeLeft = 30;
+        let num1, num2, correctAnswer;
+
+        function changeLanguage() {
+            currentLang = document.getElementById('langSelect').value;
+            const t = translations[currentLang];
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('scoreText').innerText = t.score;
+            document.getElementById('levelText').innerText = t.level;
+            document.getElementById('answerInput').placeholder = t.placeholder;
+            document.getElementById('submitBtn').innerText = t.btn;
+            document.getElementById('timer').innerText = t.time + " " + timeLeft;
+            
+            if(currentLang === 'en') {
+                document.body.setAttribute('dir', 'ltr');
+            } else {
+                document.body.setAttribute('dir', 'rtl');
+            }
         }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        }
+
+        function generateProblem() {
+            num1 = Math.floor(Math.random() * (level * 5)) + 1;
+            num2 = Math.floor(Math.random() * (level * 5)) + 1;
+            correctAnswer = num1 + num2;
+            document.getElementById('problem').innerText = ${num1} + ${num2} = ?;
+            document.getElementById('answerInput').value = '';
+        }
+
         function checkAnswer() {
-            let val = parseInt(document.getElementById('answer').value);
-            if(val === num1 + num2) {
+            const userAns = parseInt(document.getElementById('answerInput').value);
+            if (userAns === correctAnswer) {
                 score += 10;
-                document.getElementById('scoreVal').innerText = score;
-                generate();
+                if(score % 30 === 0) level++;
+                document.getElementById('score').innerText = score;
+                document.getElementById('level').innerText = level;
+                generateProblem();
             } else {
                 alert("وەڵامەکە هەڵەیە، دووبارە هەوڵ بدەرەوە!");
             }
         }
+
+        generateProblem();
     </script>
 </body>
 </html>
