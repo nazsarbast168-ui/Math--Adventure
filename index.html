@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Interpreter App</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-color: #4CAF50;
+            --border-color: #333333;
+        }
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #4CAF50;
+            --border-color: #dddddd;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        h1, h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+        .options-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .chip.active {
+            border-color: var(--accent-color);
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .color-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .color-circle.selected {
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+        .result-box {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="container" id="app"></div>
+
+    <script>
+        const TRANSLATIONS = {
+            en: {
+                title: "Math Interpreter",
+                settings: "Settings",
+                language: "Language",
+                darkMode: "Dark Mode",
+                accentColor: "Accent Color",
+                numeralSystem: "Numeral System",
+                gauge1: "First Number",
+                gauge2: "Second Number",
+                gauge3: "Sum (Result)",
+                plus: "+",
+                equals: "=",
+            },
+            ar: {
+                title: "مفسر الرياضيات",
+                settings: "الإعدادات",
+                language: "اللغة",
+                darkMode: "الوضع الداكن",
+                accentColor: "لون التمييز",
+                numeralSystem: "نظام الأرقام",
+                gauge1: "العدد الأول",
+                gauge2: "العدد الثاني",
+                gauge3: "المجموع (النتيجة)",
+                plus: "+",
+                e
