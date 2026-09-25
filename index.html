@@ -1,136 +1,94 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Interpreter App</title>
+    <title>Math Adventure - چیرۆکی بیرکاری</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --accent-color: #4CAF50;
-            --border-color: #333333;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #ec4899;
+            --border: #334155;
         }
-        [data-theme="light"] {
-            --bg-color: #f5f5f5;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --accent-color: #4CAF50;
-            --border-color: #dddddd;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body {
-            font-family: Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
-            direction: rtl;
-            transition: background 0.3s, color 0.3s;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .card {
             background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
         }
-        h1, h2 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: var(--accent-color);
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+        h1 { font-size: 1.8rem; margin-bottom: 20px; color: var(--primary); }
+        .problem { font-size: 2.5rem; margin: 20px 0; color: var(--accent); }
         input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
             background: var(--bg-color);
             color: var(--text-color);
-            box-sizing: border-box;
-        }
-        .options-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            text-align: center;
             margin-bottom: 15px;
         }
-        .chip {
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 2px solid var(--border-color);
-            background: transparent;
-            color: var(--text-color);
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1.1rem;
             cursor: pointer;
-            font-weight: bold;
         }
-        .chip.active {
-            border-color: var(--accent-color);
-            background-color: var(--accent-color);
-            color: #fff;
-        }
-        .color-picker {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .color-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .color-circle.selected {
-            border-color: #fff;
-            transform: scale(1.1);
-        }
-        .result-box {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-            color: var(--accent-color);
-        }
+        button:hover { background-color: var(--primary-hover); }
+        .score { margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
     </style>
 </head>
-<body data-theme="dark">
-    <div class="container" id="app"></div>
+<body>
+    <div class="container">
+        <h1>سەرکێشی بیرکاری</h1>
+        <div class="problem" id="problem">5 + 3 = ?</div>
+        <input type="number" id="answer" placeholder="وەڵامەکەت لێرە بنووسە...">
+        <button onclick="checkAnswer()">پشکنین</button>
+        <div class="score">نمرە: <span id="scoreVal">0</span></div>
+    </div>
 
     <script>
-        const TRANSLATIONS = {
-            en: {
-                title: "Math Interpreter",
-                settings: "Settings",
-                language: "Language",
-                darkMode: "Dark Mode",
-                accentColor: "Accent Color",
-                numeralSystem: "Numeral System",
-                gauge1: "First Number",
-                gauge2: "Second Number",
-                gauge3: "Sum (Result)",
-                plus: "+",
-                equals: "=",
-            },
-            ar: {
-                title: "مفسر الرياضيات",
-                settings: "الإعدادات",
-                language: "اللغة",
-                darkMode: "الوضع الداكن",
-                accentColor: "لون التمييز",
-                numeralSystem: "نظام الأرقام",
-                gauge1: "العدد الأول",
-                gauge2: "العدد الثاني",
-                gauge3: "المجموع (النتيجة)",
-                plus: "+",
-                e
+        let num1 = 5, num2 = 3, score = 0;
+        function generate() {
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('problem').innerText = ${num1} + ${num2} = ?;
+            document.getElementById('answer').value = '';
+        }
+        function checkAnswer() {
+            let val = parseInt(document.getElementById('answer').value);
+            if(val === num1 + num2) {
+                score += 10;
+                document.getElementById('scoreVal').innerText = score;
+                generate();
+            } else {
+                alert("وەڵامەکە هەڵەیە، دووبارە هەوڵ بدەرەوە!");
+            }
+        }
+    </script>
+</body>
+</html>
